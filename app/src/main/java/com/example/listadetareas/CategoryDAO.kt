@@ -145,7 +145,7 @@ class CategoryDAO (private val context: Context) {
                 val category= Category(id, title)
                 categoryList.add(category)
             }
-            cursor.close()
+
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
