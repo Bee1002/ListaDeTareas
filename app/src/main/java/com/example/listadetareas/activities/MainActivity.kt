@@ -1,5 +1,7 @@
 package com.example.listadetareas.activities
 
+
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -33,38 +35,58 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         categoryDAO = CategoryDAO(this)
 
         categoryList = categoryDAO.findAll()
 
-        adapter = CategoryAdapter(categoryList) {
-            // He pulsado categoria
-        }
+        adapter = CategoryAdapter(categoryList, {
+            // He pulsado una categoría
+        }, { position ->
+            val category = categoryList[position]
+            showCategoryDialog(category)
+        }, { position ->
+            val category = categoryList[position]
+            categoryDAO.delete(category)
+            loadData()
+        })
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager (this)
         binding.addCategoryButton.setOnClickListener {
-            showCategoryDialog()
+            showCategoryDialog(Category (-1L, ""))
         }
     }
 
-    fun  showCategoryDialog() {
+    fun  showCategoryDialog(category: Category) {
         val dialogBinding = DialogCreateCategoryBinding.inflate(layoutInflater)
 
+            dialogBinding.titleEditText.setText(category.title)
+
+        var dialogTitle = ""
+        var dialogIcon = 0
+
+        if (category.id !=-1L) {
+            dialogTitle = "Editar categoria"
+            dialogIcon = R.drawable.ic_edit
+        } else {
+            dialogTitle = "Crear categoria"
+            dialogIcon = R.drawable.ic_add
+        }
+
         MaterialAlertDialogBuilder(this)
-        //AlertDialog.Builder(this)
-            .setTitle("Create category")
+            .setTitle(dialogTitle)
             .setView(dialogBinding.root)
             .setPositiveButton(android.R.string.ok, { dialog, which ->
-                val title = dialogBinding.titleEditText.text.toString()
-                val category = Category(-1, title)
-                categoryDAO.insert(category)
+                category.title = dialogBinding.titleEditText.text.toString()
+                if (category.id != -1L) {
+                    categoryDAO.update(category)
+                } else {
+                    categoryDAO.insert(category)
+                }
                 loadData()
-
-
-
             })
             .setNegativeButton(android.R.string.cancel, null)
-            .setIcon(R.drawable.ic_add)
+            .setIcon(dialogIcon)
             .show()
 
     }

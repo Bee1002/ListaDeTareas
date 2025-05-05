@@ -19,19 +19,11 @@
         android:id="@+id/editButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:iconTint="@color/ic_edit"/>
+        app:icon="@drawable/ic_edit"/>
 
     <Button
         style="?attr/materialIconButtonStyle"
-        android:id="@+id/iconButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:icon="@drawable/ic_delete"
-        app:iconTint="@color/negative_red"/>
-
-    <Button
-        style="?attr/materialIconButtonStyle"
-        android:id="@+id/iconButton"
+        android:id="@+id/deleteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_delete"
