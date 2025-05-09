@@ -2,6 +2,7 @@ package com.example.listadetareas.activities
 
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -40,15 +41,21 @@ class MainActivity : AppCompatActivity() {
 
         categoryList = categoryDAO.findAll()
 
-        adapter = CategoryAdapter(categoryList, {
+        adapter = CategoryAdapter(categoryList, { position ->
             // He pulsado una categoría
+            val category = categoryList[position]
+
+            val intent = Intent (this, TaskListActivity::class.java)
+            intent.putExtra("CATEGORY_ID", category.id)
+            startActivity(intent)
+            "CATEGORY_ID"
         }, { position ->
+            // Edit
             val category = categoryList[position]
             showCategoryDialog(category)
         }, { position ->
-            val category = categoryList[position]
-            categoryDAO.delete(category)
-            loadData()
+            // Delete
+            showDeleteConfirmation(position)
         })
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager (this)
@@ -88,8 +95,23 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton(android.R.string.cancel, null)
             .setIcon(dialogIcon)
             .show()
-
     }
+
+    fun showDeleteConfirmation(position: Int) {
+        val category = categoryList[position]
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Borrar categoria")
+            .setMessage("¿Esta usted seguro de querer borrar esta categoria? Borrar la categoria eliminara todas sus tareas")
+            .setPositiveButton(android.R.string.ok, { dialog, which ->
+                categoryDAO.delete(category)
+                loadData()
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .setIcon(R.drawable.ic_delete)
+            .show()
+    }
+
     fun loadData() {
         categoryList = categoryDAO.findAll()
         adapter.updateItems(categoryList)
