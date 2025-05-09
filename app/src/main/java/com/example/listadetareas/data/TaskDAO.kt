@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.listadetareas.utils.DatabaseManager
 
-class TaskDAo(private val context: Context) {
+class TaskDAO(private val context: Context) {
     
         private lateinit var db: SQLiteDatabase
 
@@ -65,9 +65,8 @@ class TaskDAo(private val context: Context) {
             try {
                 // Define 'where' part of query.
                 val selection = "${Task.COLUMN_NAME_ID} = ${task.id}"
-// Specify arguments in placeholder order.
-                val selectionArgs = arrayOf("MyTitle")
-// Issue SQL statement.
+
+            // Issue SQL statement.
                 val deletedRows = db.delete(Task.TABLE_NAME, selection, null)
 
                 Log.i("DATABASE", "Delete task with id: ${task.id}")

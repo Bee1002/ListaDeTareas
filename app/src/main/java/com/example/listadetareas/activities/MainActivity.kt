@@ -21,8 +21,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
+
     lateinit var  adapter: CategoryAdapter
     var categoryList: List<Category> = emptyList()
+
     lateinit var  categoryDAO: CategoryDAO
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +50,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent (this, TaskListActivity::class.java)
             intent.putExtra("CATEGORY_ID", category.id)
             startActivity(intent)
-            "CATEGORY_ID"
         }, { position ->
             // Edit
             val category = categoryList[position]
@@ -59,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         })
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager (this)
+
         binding.addCategoryButton.setOnClickListener {
             showCategoryDialog(Category (-1L, ""))
         }
@@ -71,7 +73,6 @@ class MainActivity : AppCompatActivity() {
 
         var dialogTitle = ""
         var dialogIcon = 0
-
         if (category.id !=-1L) {
             dialogTitle = "Editar categoria"
             dialogIcon = R.drawable.ic_edit

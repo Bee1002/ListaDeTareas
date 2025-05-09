@@ -1,5 +1,6 @@
 package com.example.listadetareas.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
@@ -12,7 +13,7 @@ import com.example.listadetareas.adapters.TaskAdapter
 import com.example.listadetareas.data.Category
 import com.example.listadetareas.data.CategoryDAO
 import com.example.listadetareas.data.Task
-import com.example.listadetareas.data.TaskDAo
+import com.example.listadetareas.data.TaskDAO
 import com.example.listadetareas.databinding.ActivityTaskListBinding
 
 class TaskListActivity : AppCompatActivity() {
@@ -22,7 +23,7 @@ class TaskListActivity : AppCompatActivity() {
     lateinit var  categoryDAO: CategoryDAO
     lateinit var category: Category
 
-    lateinit var taskDAo: TaskDAo
+    lateinit var taskDAO: TaskDAO
     lateinit var  taskList: List<Task>
 
     lateinit var  adapter: TaskAdapter
@@ -41,11 +42,11 @@ class TaskListActivity : AppCompatActivity() {
         }
 
         categoryDAO = CategoryDAO(this)
-        taskDAo = TaskDAo(this)
+        taskDAO = TaskDAO(this)
 
         val id = intent.getLongExtra("CATEGORY_ID", -1)
         category = categoryDAO.findById(id)!!
-        taskList = taskDAo.findAllByCategory(category)
+        taskList = emptyList()
 
         adapter = TaskAdapter(taskList, {
             // He hecho click en una tarea
@@ -58,6 +59,19 @@ class TaskListActivity : AppCompatActivity() {
 
         supportActionBar?.title = category.title
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        binding.addTaskButton.setOnClickListener {
+            val intent =Intent (this, TaskActivity::class.java)
+            intent.putExtra("CATEGORY_ID", category.id)
+            startActivity(intent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        taskList = taskDAO.findAllByCategory(category)
+        adapter.updateItems(taskList)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
