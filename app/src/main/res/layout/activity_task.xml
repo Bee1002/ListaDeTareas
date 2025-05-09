@@ -17,7 +17,7 @@
         android:id="@+id/titleEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="¿Que hay que hacer hoy?"/>
+        android:hint="¿Lista de tareas?"/>
 
     <Button
         android:id="@+id/saveButton"
