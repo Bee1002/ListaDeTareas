@@ -1,10 +1,16 @@
 package com.example.listadetareas.activities
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.ContextMenu
+import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -48,10 +54,48 @@ class TaskListActivity : AppCompatActivity() {
         category = categoryDAO.findById(id)!!
         taskList = emptyList()
 
-        adapter = TaskAdapter(taskList, {
-            // He hecho click en una tarea
-        }, {
-            // He checkeado una tarea
+        adapter = TaskAdapter(taskList, { position ->
+            val task = taskList[position]
+            val intent =Intent (this, TaskActivity::class.java)
+            intent.putExtra("CATEGORY_ID", category.id)
+            intent.putExtra("TASK_ID", task.id)
+            startActivity(intent)
+        }, { position ->
+            val task = taskList[position]
+            task.done = !task.done
+            taskDAO.update(task)
+            reloadData()
+
+        }, { position, v ->
+            
+            val task = taskList[position]
+
+            val popup = PopupMenu(this, v)
+            popup.menuInflater.inflate(R.menu.task_context_menu, popup.menu)
+
+            popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+                return@setOnMenuItemClickListener when (menuItem.itemId) {
+                    R.id.action_edit -> {
+                        val intent = Intent(this, TaskActivity::class.java)
+                        intent.putExtra("CATEGORY_ID", category.id)
+                        intent.putExtra("TASK_ID", task.id)
+                        startActivity(intent)
+                        true
+                    }
+                    R.id.action_delete -> {
+                        taskDAO.delete(task)
+                        reloadData()
+                        true
+                    }
+                    else -> super.onContextItemSelected(menuItem)
+                }
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                popup.setForceShowIcon(true)
+            }
+
+            popup.show()
         })
 
         binding.recyclerView.adapter = adapter
@@ -61,7 +105,7 @@ class TaskListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.addTaskButton.setOnClickListener {
-            val intent =Intent (this, TaskActivity::class.java)
+            val intent =  Intent (this, TaskActivity::class.java)
             intent.putExtra("CATEGORY_ID", category.id)
             startActivity(intent)
         }
@@ -70,8 +114,33 @@ class TaskListActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+       reloadData()
+    }
+
+    fun reloadData() {
         taskList = taskDAO.findAllByCategory(category)
         adapter.updateItems(taskList)
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        menuInflater.inflate(R.menu.task_context_menu, menu)
+    }
+
+    // Then, to handle clicks:
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        val info = item.menuInfo as AdapterView.AdapterContextMenuInfo
+        return when (item.itemId) {
+            R.id.action_edit -> {
+                // Respond to context menu item 1 click.
+                true
+            }
+            R.id.action_delete -> {
+                // Respond to context menu item 2 click.
+                true
+            }
+            else -> super.onContextItemSelected(item)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

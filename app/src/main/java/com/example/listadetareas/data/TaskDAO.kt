@@ -44,6 +44,7 @@ class TaskDAO(private val context: Context) {
                 // New value for one column
                 val values = ContentValues().apply {
                     put(Task.COLUMN_NAME_DONE, task.done)
+                    put(Task.COLUMN_NAME_TITLE, task.title)
                     put(Task.COLUMN_NAME_CATEGORY, task.category.id)
                 }
 
@@ -104,7 +105,7 @@ class TaskDAO(private val context: Context) {
                     null,          // The values for the WHERE clause
                     null,                   // don't group the rows
                     null,                   // don't filter by row groups
-                    null               // The sort order
+                    Task.COLUMN_NAME_DONE               // The sort order
                 )
                 if (cursor.moveToNext()) {
                     val id = cursor.getLong(cursor.getColumnIndexOrThrow(Task.COLUMN_NAME_ID))
