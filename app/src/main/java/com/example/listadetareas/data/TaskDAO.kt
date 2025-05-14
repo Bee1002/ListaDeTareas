@@ -37,7 +37,7 @@ class TaskDAO(private val context: Context) {
                 close()
             }
         }
-        // Actualizar
+        // Actualiza
         fun update(task: Task) {
             open()
             try {
